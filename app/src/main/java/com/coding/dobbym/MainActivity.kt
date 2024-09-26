@@ -47,19 +47,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var expanded by rememberSaveable {
-        mutableStateOf(false)
-    }
+private fun Greeting(name: String, modifier: Modifier = Modifier) {
+
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
     val extraPadding by animateDpAsState(
         if (expanded) 48.dp else 0.dp,
-        label = "",
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
-
     Surface(
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
@@ -68,19 +66,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = extraPadding)
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
             ) {
-                Text(text = "Hello ")
+                Text(text = "Hello, ")
                 Text(text = name)
             }
-            ElevatedButton(onClick = { expanded = !expanded }) {
-                Text(
-                    if (expanded) {
-                        "Show less"
-                    } else {
-                        "Show more"
-                    }
-                )
+            ElevatedButton(
+                onClick = { expanded = !expanded }
+            ) {
+                Text(if (expanded) "Show less" else "Show more")
             }
         }
     }
@@ -102,26 +96,36 @@ fun MyApp(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Greetings(
+private fun Greetings(
+    modifier: Modifier = Modifier,
     names: List<String> = List(1000) { "$it" }
 ) {
-    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
         items(items = names) { name ->
             Greeting(name = name)
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 320)
 @Composable
 fun GreetingPreview() {
-    DobbyMTheme {
-        MyApp()
-    }
+    Greetings()
+}
+
+@Preview
+@Composable
+fun MyAppPreview() {
+    MyApp(Modifier.fillMaxSize())
 }
 
 @Composable
-fun OnboardingScreen(onContinueClicked: () -> Unit, modifier: Modifier = Modifier) {
+fun OnboardingScreen(
+    onContinueClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -135,6 +139,7 @@ fun OnboardingScreen(onContinueClicked: () -> Unit, modifier: Modifier = Modifie
             Text("Continue")
         }
     }
+
 }
 
 @Preview(showBackground = true, widthDp = 320, heightDp = 320)
