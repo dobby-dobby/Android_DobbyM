@@ -41,29 +41,30 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 }
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val expanded = remember {
+    var expanded by remember {
         mutableStateOf(false)
     }
-    val extraPadding = if (expanded.value) 48.dp else 0.dp
+    val extraPadding = if (expanded) 48.dp else 0.dp
 
     Surface(
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
         Row(modifier = Modifier.padding(24.dp)) {
-            Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(bottom = extraPadding)) {
                 Text(text = "Hello ")
                 Text(text = name)
             }
-            ElevatedButton(onClick = { expanded.value = !expanded.value }) {
+            ElevatedButton(onClick = { expanded = !expanded }) {
                 Text(
-                    if (expanded.value) {
+                    if (expanded) {
                         "Show more"
                     } else {
                         "Show less"
@@ -75,9 +76,28 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MyApp(modifier: Modifier = Modifier, names: List<String> = listOf("Dobby", "Gaming", "Soon")){
-    Column (modifier = modifier.padding(vertical = 4.dp)){
-        for (name in names){
+fun MyApp(modifier: Modifier = Modifier){
+
+    // by: by keyword instead of the =. This is a property delegate that saves you from typing .value every time.
+    var shouldShowOnboarding by remember { mutableStateOf(true) }
+
+    Surface(modifier) {
+        if (shouldShowOnboarding){
+            OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
+        } else {
+            Greetings()
+        }
+    }
+    Greetings()
+}
+
+@Composable
+fun Greetings(
+    modifier: Modifier = Modifier,
+    names: List<String> = listOf("Fromis_9", "TWICE", "BLACKPINK")
+) {
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
+        for (name in names) {
             Greeting(name = name)
         }
     }
@@ -92,12 +112,7 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier) {
-    // TODO: This state should be hoisted
-
-    // by: by keyword instead of the =. This is a property delegate that saves you from typing .value every time.
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
-
+fun OnboardingScreen(onContinueClicked: () -> Unit ,modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -106,7 +121,7 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
         Text("Welcome to the Basics Codelab!")
         Button(
             modifier = Modifier.padding(vertical = 24.dp),
-            onClick = { shouldShowOnboarding = false }
+            onClick = onContinueClicked
         ) {
             Text("Continue")
         }
@@ -116,5 +131,5 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true, widthDp = 320, heightDp = 320)
 @Composable
 fun OnboardingPreview() {
-    OnboardingScreen()
+    OnboardingScreen(onContinueClicked = {})
 }
